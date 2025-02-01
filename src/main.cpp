@@ -31,8 +31,7 @@ class $modify(PolzEditorUI, EditorUI) {
 		toggleGuide->setVisible(0);
 		editorButtonsMenu->addChild(toggleGuide);
 		editorButtonsMenu->updateLayout();
-		toggleGuide->setPosition({m_editHSVBtn->getPosition().x - 36.f, m_editHSVBtn->getPosition().y - 3.f});
-		toggleGuide->setScale(.8f);
+		toggleGuide->setPosition({m_editHSVBtn->getPosition().x - 38.5f, m_editHSVBtn->getPosition().y - 3.f});
 
 		return true;
 	}

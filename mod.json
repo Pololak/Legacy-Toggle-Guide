@@ -7,9 +7,10 @@
 	},
 	"id": "pololak.legacy-toggle-guide",
 	"name": "Legacy Toggle Guide",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "Pololak",
 	"description": "Like it was in 2.1",
+	"tags": ["editor"],
 	"dependencies": [{
 		"id": "geode.node-ids",
         "version": ">=v1.19.0",
