@@ -6,15 +6,16 @@ using namespace geode::prelude;
 
 class $modify(PolzEditorUI, EditorUI) {
 	struct Fields {
-		std::set<int>gameModePortals_ids = {13, 47, 111, 660, 1331, 1933};
-		std::set<int>speedPortals_ids = {200, 201, 202, 203, 1334};
+		std::set<int>obj_ids = {13, 47, 111, 660, 1331, 1933, 200, 201, 202, 203, 1334};
 	};
 
 	void onCustomToggleGuide(CCObject*) {
-		if (this->getSelectedObjects()->count()) {
-			auto obj = reinterpret_cast<EffectGameObject*>(this->m_selectedObject);
-			obj->m_shouldPreview = !obj->m_shouldPreview;
-			this->m_editorLayer->tryUpdateSpeedObject(obj, false);
+		if (this->getSelectedObjects()->count() == 1) {
+			if (m_fields->obj_ids.contains(this->m_selectedObject->m_objectID)) {
+				auto obj = static_cast<EffectGameObject*>(this->m_selectedObject);
+				obj->m_shouldPreview = !obj->m_shouldPreview;
+				this->m_editorLayer->tryUpdateSpeedObject(obj, false);
+			}
 		}
 	}
 
@@ -43,14 +44,16 @@ class $modify(PolzEditorUI, EditorUI) {
 		if (editorButtonsMenu) {
 			auto toggleGuide = static_cast<CCMenuItemToggler*>(editorButtonsMenu->getChildByID("polz-preview-toggle"_spr));
 			if (toggleGuide) {
-				if (this->getSelectedObjects()->count() == 1 && (m_fields->gameModePortals_ids.contains(this->m_selectedObject->m_objectID) || m_fields->speedPortals_ids.contains(this->m_selectedObject->m_objectID))) {
-						toggleGuide->setVisible(1);
+				if ((this->getSelectedObjects()->count() == 1) && m_fields->obj_ids.contains(m_selectedObject->m_objectID))
+				{
+					toggleGuide->setVisible(1);
 				}
-				else {
-						toggleGuide->setVisible(0);
+				else
+				{
+					toggleGuide->setVisible(0);
 				}
-				if (reinterpret_cast<EffectGameObject*>(this->m_selectedObject)) {
-					toggleGuide->toggle(reinterpret_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
+				if (static_cast<EffectGameObject*>(this->m_selectedObject)) {
+					toggleGuide->toggle(static_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
 				}
 			}
 		}
