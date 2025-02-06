@@ -12,9 +12,11 @@ class $modify(PolzEditorUI, EditorUI) {
 	void onCustomToggleGuide(CCObject*) {
 		if (this->getSelectedObjects()->count() == 1) {
 			if (m_fields->obj_ids.contains(this->m_selectedObject->m_objectID)) {
-				auto obj = dynamic_cast<EffectGameObject*>(this->m_selectedObject);
-				obj->m_shouldPreview = !obj->m_shouldPreview;
-				this->m_editorLayer->tryUpdateSpeedObject(obj, false);
+				auto obj = typeinfo_cast<EffectGameObject*>(this->m_selectedObject);
+				if (obj) {
+					obj->m_shouldPreview = !obj->m_shouldPreview;
+					this->m_editorLayer->tryUpdateSpeedObject(obj, false);
+				}
 			}
 		}
 	}
@@ -42,7 +44,7 @@ class $modify(PolzEditorUI, EditorUI) {
 
 		auto editorButtonsMenu = this->getChildByID("editor-buttons-menu");
 		if (editorButtonsMenu) {
-			auto toggleGuide = dynamic_cast<CCMenuItemToggler*>(editorButtonsMenu->getChildByID("polz-preview-toggle"_spr));
+			auto toggleGuide = typeinfo_cast<CCMenuItemToggler*>(editorButtonsMenu->getChildByID("polz-preview-toggle"_spr));
 			if (toggleGuide) {
 				if ((this->getSelectedObjects()->count() == 1) && m_fields->obj_ids.contains(m_selectedObject->m_objectID))
 				{
@@ -52,8 +54,8 @@ class $modify(PolzEditorUI, EditorUI) {
 				{
 					toggleGuide->setVisible(0);
 				}
-				if (dynamic_cast<EffectGameObject*>(this->m_selectedObject)) {
-					toggleGuide->toggle(dynamic_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
+				if (typeinfo_cast<EffectGameObject*>(this->m_selectedObject)) {
+					toggleGuide->toggle(typeinfo_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
 				}
 			}
 		}
