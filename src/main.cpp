@@ -5,90 +5,85 @@ using namespace geode::prelude;
 #include <Geode/modify/EditorUI.hpp>
 
 class $modify(PolzEditorUI, EditorUI) {
+
+	static void onModify(auto& self) {
+        (void) self.setHookPriorityPost("EditorUI::init", Priority::Late);
+    }
+
 	struct Fields {
-		std::set<int>obj_ids = {13, 47, 111, 660, 1331, 1933, 200, 201, 202, 203, 1334};
+		std::set<int> m_portalIDs = {13, 47, 111, 660, 1331, 1933, 200, 201, 202, 203, 1334};
+		CCMenuItemToggler* m_toggleGuide;
 	};
 
 	void onCustomToggleGuide(CCObject*) {
-		if (this->getSelectedObjects()->count() == 1) {
-			if (m_fields->obj_ids.contains(this->m_selectedObject->m_objectID)) {
-				auto obj = typeinfo_cast<EffectGameObject*>(this->m_selectedObject);
-				if (obj) {
-					obj->m_shouldPreview = !obj->m_shouldPreview;
-					this->m_editorLayer->tryUpdateSpeedObject(obj, false);
-				}
-			}
+		auto fields = m_fields.self();
+
+		if (EffectGameObject* object = typeinfo_cast<EffectGameObject*>(this->m_selectedObject)) {
+			if (!fields->m_portalIDs.contains(this->m_selectedObject->m_objectID)) return;
+			object->m_shouldPreview = !object->m_shouldPreview;
+			fields->m_toggleGuide->toggle(object->m_shouldPreview);
+			this->m_editorLayer->tryUpdateSpeedObject(object, false);
+		}
+	}
+
+	void fillPaddingButtons() {
+		auto fields = m_fields.self();
+
+		auto editorButtonsMenu = this->getChildByID("editor-buttons-menu");
+		int childrenCount = editorButtonsMenu->getChildrenCount();
+		int padAmount = 16 - childrenCount - 1;
+
+		for (int i = 0; i < padAmount; i++) {
+			CCNode* paddingNode = CCNode::create();
+			paddingNode->setID("padding"_spr);
+			paddingNode->setContentSize({40, 40});
+			editorButtonsMenu->addChild(paddingNode);
 		}
 	}
 
 	bool init(LevelEditorLayer* editorLayer) {
 		if (!EditorUI::init(editorLayer)) return false;
+
+		auto fields = m_fields.self();
 		
 		auto editorButtonsMenu = this->getChildByID("editor-buttons-menu");
 
-		auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
-		auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+		fields->m_toggleGuide = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 1);
+		auto toggleGuideContainer = CCMenuItemSpriteExtra::create(fields->m_toggleGuide, this, menu_selector(PolzEditorUI::onCustomToggleGuide));
 
-		auto toggleGuide = CCMenuItemToggler::create(toggleOn, toggleOff, this, menu_selector(PolzEditorUI::onCustomToggleGuide));
-		toggleGuide->setID("polz-preview-toggle"_spr);
-		toggleGuide->setVisible(0);
-		editorButtonsMenu->addChild(toggleGuide);
+		toggleGuideContainer->setID("polz-preview-toggle"_spr);
+
+		fields->m_toggleGuide->setVisible(false);
+		fields->m_toggleGuide->setPositionX(fields->m_toggleGuide->getPositionX() - 1);
+		toggleGuideContainer->setContentSize({40, 40});
+
+		fillPaddingButtons();
+
+		editorButtonsMenu->addChild(toggleGuideContainer);
+
+		if (editorButtonsMenu->getChildrenCount() > 15) {
+			CCNode* child15 = static_cast<CCNode*>(editorButtonsMenu->getChildren()->objectAtIndex(15));
+			editorButtonsMenu->swapChildIndices(toggleGuideContainer, child15);
+		}
+
 		editorButtonsMenu->updateLayout();
-		toggleGuide->setPosition({m_editHSVBtn->getPosition().x - 38.5f, m_editHSVBtn->getPosition().y - 3.f});
 
 		return true;
 	}
 
 	void updateButtons() {
 		EditorUI::updateButtons();
+		auto fields = m_fields.self();
 
-		auto editorButtonsMenu = this->getChildByID("editor-buttons-menu");
-		if (editorButtonsMenu) {
-			auto toggleGuide = typeinfo_cast<CCMenuItemToggler*>(editorButtonsMenu->getChildByID("polz-preview-toggle"_spr));
-			if (toggleGuide) {
-				if ((this->getSelectedObjects()->count() == 1) && m_fields->obj_ids.contains(m_selectedObject->m_objectID))
-				{
-					toggleGuide->setVisible(1);
-				}
-				else
-				{
-					toggleGuide->setVisible(0);
-				}
-				if (typeinfo_cast<EffectGameObject*>(this->m_selectedObject)) {
-					toggleGuide->toggle(typeinfo_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
-				}
-			}
+		if (!fields->m_toggleGuide) return;
+
+		if (EffectGameObject* object = typeinfo_cast<EffectGameObject*>(this->m_selectedObject)) {
+			if (!fields->m_portalIDs.contains(m_selectedObject->m_objectID)) return;
+			fields->m_toggleGuide->toggle(object->m_shouldPreview);
+			fields->m_toggleGuide->setVisible(true);
+		}
+		else {
+			fields->m_toggleGuide->setVisible(false);
 		}
 	}
-
-	// Idk why i started recreating 1.9-2.1 function xd, im so strange
-
-	// void toggleGuideButton() {
-	// 	m_fields->bVar2 = false;
-	// 	m_fields->local_8 = 0;
-	// 	if (this->m_selectedObject != nullptr) {
-	// 		m_fields->iVar1 = this->m_selectedObject->m_objectID;
-	// 		if (m_fields->iVar1 < 0xcc) {
-	// 			if (((m_fields->iVar1 < 200) && (m_fields->iVar1 != 0xd)) && ((m_fields->iVar1 != 0x2f && (m_fields->iVar1 != 0x6f)))) PolzEditorUI::lab_00479126();
-	// 		}
-	// 		else if (((m_fields->iVar1 != 0x294) && (m_fields->iVar1 != 0x533)) && (m_fields->iVar1 != 0x536)) PolzEditorUI::lab_00479126();
-	// 		m_fields->bVar2 = true;
-	// 		m_fields->local_8 = 1;
-	// 	} 
-	// }
-
-	// void lab_00479126() {
-	// 	auto editorButtonsMenu = this->getChildByID("editor-buttons-menu");
-	// 	if (editorButtonsMenu)
-	// 	{
-	// 		auto toggleGuide = static_cast<CCMenuItemToggler *>(editorButtonsMenu->getChildByID("polz-preview-toggle"_spr));
-	// 		if (toggleGuide)
-	// 		{
-	// 			toggleGuide->m_bVisible = m_fields->local_8;
-	// 			if (m_fields->bVar2) {
-	// 				toggleGuide->toggle(reinterpret_cast<EffectGameObject*>(this->m_selectedObject)->m_shouldPreview == 0);
-	// 			}
-	// 		}
-	// 	}
-	// }
 };
