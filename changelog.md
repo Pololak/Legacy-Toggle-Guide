@@ -1,3 +1,6 @@
+# 1.0.5
+- Crash fix by Alphalaneous.
+
 # 1.0.4
 - Code polishing......
 
