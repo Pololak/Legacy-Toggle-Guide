@@ -77,13 +77,25 @@ class $modify(PolzEditorUI, EditorUI) {
 
 		if (!fields->m_toggleGuide) return;
 
+		auto thatThingThatIDontUnderstand = typeinfo_cast<CCMenuItemSpriteExtra*>(this->getChildByID("editor-buttons-menu")->getChildByID("polz-preview-toggle"_spr));
+
+		if (!thatThingThatIDontUnderstand) return;
+
 		if (EffectGameObject* object = typeinfo_cast<EffectGameObject*>(this->m_selectedObject)) {
 			if (!fields->m_portalIDs.contains(m_selectedObject->m_objectID)) return;
 			fields->m_toggleGuide->toggle(object->m_shouldPreview);
 			fields->m_toggleGuide->setVisible(true);
+			fields->m_toggleGuide->setEnabled(true);
+
+			thatThingThatIDontUnderstand->setVisible(true);
+			thatThingThatIDontUnderstand->setEnabled(true);
 		}
 		else {
 			fields->m_toggleGuide->setVisible(false);
+			fields->m_toggleGuide->setEnabled(false);
+
+			thatThingThatIDontUnderstand->setVisible(false);
+			thatThingThatIDontUnderstand->setEnabled(false);
 		}
 	}
 };
