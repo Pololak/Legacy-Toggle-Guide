@@ -1,4 +1,5 @@
-name: Build That Shit
+name: Build Geode Mod
+
 on:
   workflow_dispatch:
   push:
@@ -14,18 +15,18 @@ jobs:
         - name: Windows
           os: windows-latest
 
-        - name: bleh
+        - name: macOS
           os: macos-latest
 
-        - name: whygeodeevenexistforthis
+        - name: iOS
           os: macos-latest
           target: iOS
 
-        - name: lmao
+        - name: Android32
           os: ubuntu-latest
           target: Android32
 
-        - name: cooliguess
+        - name: Android64
           os: ubuntu-latest
           target: Android64
 
@@ -35,14 +36,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build That Shit
+      - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
 
   package:
-    name: final step
+    name: Package builds
     runs-on: ubuntu-latest
     needs: ['build']
 
