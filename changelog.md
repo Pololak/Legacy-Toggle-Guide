@@ -1,3 +1,6 @@
+# 1.0.6
+- Disabling/Enabling toggler on playtest and other stuff.
+
 # 1.0.5
 - Crash fix by Alphalaneous.
 
